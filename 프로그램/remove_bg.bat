@@ -11,7 +11,7 @@ where uv >nul 2>nul
 if errorlevel 1 (
   powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0setup_uv.ps1"
   if errorlevel 1 exit /b 1
-  set "PATH=%PATH%;%USERPROFILE%\.localin"
+  set "PATH=%PATH%;%USERPROFILE%\.local\bin"
 )
 uv run "%~dp0remove_bg.py" %*
 pause
