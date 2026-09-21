@@ -30,9 +30,14 @@ if errorlevel 1 (
     exit /b 1
   )
 )
-uv run --gui-script "%APP%" > "%LOG%" 2>&1
+rem "< nul" gives uv a valid stdin (avoids "warning: Making stdin inheritable failed" when launched from Explorer).
+uv run --gui-script "%APP%" < nul > "%LOG%" 2>&1
 if errorlevel 1 (
-  start "" notepad "%LOG%"
-) else (
-  erase "%LOG%" >nul 2>nul
+  rem Show the log only if it contains something besides harmless "warning:" lines.
+  findstr /v /i /r /c:"^warning:" /c:"^ *$" "%LOG%" >nul 2>nul
+  if not errorlevel 1 (
+    start "" notepad "%LOG%"
+    exit /b 1
+  )
 )
+erase "%LOG%" >nul 2>nul
