@@ -66,6 +66,9 @@ INACTIVE_D = "#251b5c"
 
 PV_W, PV_H = 270, 190   # 미리보기 칸 기준 크기 (배율 1.0)
 LEFT_W = 330            # 왼쪽 열 기준 너비
+TAB_H = 148             # 오른쪽 카드의 탭 내용 영역 기준 높이
+PREVIEW_WORK = 640      # 미리보기 계산용 이미지의 긴 변 최대 px
+MAX_PX = 8192           # 크기·캔버스 입력 상한 (메모리 보호)
 S = 1.0                 # 현재 배율 (창 크기에 따라 바뀜)
 
 
@@ -179,6 +182,17 @@ T = {
         "set_change": "▶ 변경", "set_reset": "↻ 기본값(원본 옆)", "set_open": "▣ 폴더 열기",
         "set_close": "닫기",
         "set_saved": "설정은 자동으로 저장돼요",
+        # 크기 · 업스케일 · 자르기 · 위치
+        "tab_bg": "배경", "tab_size": "크기·업스케일", "tab_crop": "자르기", "tab_pos": "위치",
+        "rz_none": "사용 안 함", "rz_scale": "배율로", "rz_size": "크기 지정",
+        "sc_name": "배율", "sc_size": "크기", "keep_ratio": "비율 유지",
+        "method": "방식", "m_nearest": "또렷하게(도트)", "m_smooth": "부드럽게", "m_sharp": "선명하게",
+        "pad_name": "남길 여백",
+        "crop_l": "왼쪽", "crop_t": "위", "crop_r": "오른쪽", "crop_b": "아래",
+        "crop_hint": "자르기는 배경을 지운 직후에, '투명 여백 잘라내기'는 그다음에 적용돼요.",
+        "cv_use": "캔버스 사용", "cv_fit": "크기 맞춤",
+        "off_x": "가로 이동", "off_y": "세로 이동", "margin": "안쪽 여백",
+        "size_info": "원본 {ow}×{oh}px  ➜  결과 {w}×{h}px",
     },
     "en": {
         "win_title": "BG Eraser ✦ Game image transparency tool",
@@ -220,6 +234,16 @@ T = {
         "set_change": "▶ Change", "set_reset": "↻ Default (next to original)", "set_open": "▣ Open folder",
         "set_close": "Close",
         "set_saved": "Settings are saved automatically",
+        "tab_bg": "Background", "tab_size": "Resize/Upscale", "tab_crop": "Crop", "tab_pos": "Position",
+        "rz_none": "Off", "rz_scale": "By scale", "rz_size": "By size",
+        "sc_name": "Scale", "sc_size": "Size", "keep_ratio": "Keep ratio",
+        "method": "Method", "m_nearest": "Crisp (pixel art)", "m_smooth": "Smooth", "m_sharp": "Sharp",
+        "pad_name": "Keep margin",
+        "crop_l": "Left", "crop_t": "Top", "crop_r": "Right", "crop_b": "Bottom",
+        "crop_hint": "Crop is applied right after the background is removed; 'Trim transparent margin' comes next.",
+        "cv_use": "Use canvas", "cv_fit": "Fit to canvas",
+        "off_x": "Move X", "off_y": "Move Y", "margin": "Inner margin",
+        "size_info": "Original {ow}×{oh}px  ➜  Result {w}×{h}px",
     },
     "ja": {
         "win_title": "背景消しゴム ✦ ゲーム画像 背景透過ツール",
@@ -261,6 +285,16 @@ T = {
         "set_change": "▶ 変更", "set_reset": "↻ 初期値(元画像の隣)", "set_open": "▣ フォルダを開く",
         "set_close": "閉じる",
         "set_saved": "設定は自動で保存されます",
+        "tab_bg": "背景", "tab_size": "サイズ・拡大", "tab_crop": "切り抜き", "tab_pos": "位置",
+        "rz_none": "使わない", "rz_scale": "倍率で", "rz_size": "サイズ指定",
+        "sc_name": "倍率", "sc_size": "サイズ", "keep_ratio": "比率を保つ",
+        "method": "方式", "m_nearest": "くっきり(ドット)", "m_smooth": "なめらか", "m_sharp": "シャープ",
+        "pad_name": "残す余白",
+        "crop_l": "左", "crop_t": "上", "crop_r": "右", "crop_b": "下",
+        "crop_hint": "切り抜きは背景を消した直後に、「透明な余白を切り取る」はその次に適用されます。",
+        "cv_use": "キャンバス使用", "cv_fit": "サイズ合わせ",
+        "off_x": "横に移動", "off_y": "縦に移動", "margin": "内側の余白",
+        "size_info": "元 {ow}×{oh}px  ➜  結果 {w}×{h}px",
     },
     "zh": {
         "win_title": "背景橡皮擦 ✦ 游戏图片背景透明化工具",
@@ -302,6 +336,16 @@ T = {
         "set_change": "▶ 更改", "set_reset": "↻ 恢复默认(原图旁边)", "set_open": "▣ 打开文件夹",
         "set_close": "关闭",
         "set_saved": "设置会自动保存",
+        "tab_bg": "背景", "tab_size": "缩放/放大", "tab_crop": "裁剪", "tab_pos": "位置",
+        "rz_none": "不使用", "rz_scale": "按倍率", "rz_size": "指定尺寸",
+        "sc_name": "倍率", "sc_size": "尺寸", "keep_ratio": "保持比例",
+        "method": "方式", "m_nearest": "清晰(像素)", "m_smooth": "平滑", "m_sharp": "锐化",
+        "pad_name": "保留边距",
+        "crop_l": "左", "crop_t": "上", "crop_r": "右", "crop_b": "下",
+        "crop_hint": "裁剪在去除背景后立即应用，「裁掉透明边距」在其之后应用。",
+        "cv_use": "使用画布", "cv_fit": "适应画布",
+        "off_x": "横向移动", "off_y": "纵向移动", "margin": "内边距",
+        "size_info": "原图 {ow}×{oh}px  ➜  结果 {w}×{h}px",
     },
 }
 
@@ -412,6 +456,11 @@ class GameButton(tk.Canvas):
         self.config(cursor="hand2" if state == "normal" else "arrow")
         self._draw()
 
+    def restyle(self, color, dark, fg):
+        """탭·선택 버튼(칩)의 켜짐/꺼짐 색을 바꾼다."""
+        self.color, self.dark, self.fg = color, dark, fg
+        self._draw()
+
     def _draw(self):
         self.delete("all")
         r, sh, dn = sc(13), sc(6), sc(3)
@@ -430,11 +479,12 @@ class GameButton(tk.Canvas):
 
 
 class GameSlider(tk.Canvas):
-    def __init__(self, parent, var, lo, hi, color=GOLD, width=170, on_change=None):
+    def __init__(self, parent, var, lo, hi, color=GOLD, width=170, on_change=None, suffix=""):
         self.tw = sc(width)
-        super().__init__(parent, width=self.tw + sc(50), height=sc(30), bg=parent["bg"],
+        super().__init__(parent, width=self.tw + sc(66), height=sc(30), bg=parent["bg"],
                          highlightthickness=0, cursor="hand2")
         self.var, self.lo, self.hi, self.color, self.on_change = var, lo, hi, color, on_change
+        self.suffix = suffix
         self.bind("<Button-1>", self._drag)
         self.bind("<B1-Motion>", self._drag)
         self._draw()
@@ -457,7 +507,8 @@ class GameSlider(tk.Canvas):
         self.create_oval(x - k, sc(4), x + k, sc(26), fill=shade(self.color, .75), outline="")
         self.create_oval(x - k, sc(2), x + k, sc(24), fill="#fff1b8" if self.color == GOLD else GOLD,
                          outline=TEXT, width=max(1, sc(2)))
-        self.create_text(self.tw + sc(38), sc(15), text=str(int(self.var.get())), fill=TEXT, font=F(11))
+        self.create_text(self.tw + sc(42), sc(15), text=f"{int(self.var.get())}{self.suffix}", fill=TEXT,
+                         font=F(10))
 
 
 class GameToggle(tk.Canvas):
@@ -497,6 +548,48 @@ class GameBar(tk.Canvas):
         round_rect(self, 0, 0, w, h, sc(9), fill=DARK, outline=PANEL_HI)
         if pct > 0:
             round_rect(self, 2, 2, max(sc(20), 2 + (w - 4) * pct / 100), h - 2, sc(8), fill=MINT)
+
+
+class GameAlignGrid(tk.Canvas):
+    """3x3 위치 선택 격자. (왼쪽·가운데·오른쪽) x (위·가운데·아래)"""
+
+    def __init__(self, parent, var_x, var_y, on_change=None):
+        self.cell = sc(26)
+        super().__init__(parent, width=self.cell * 3 + sc(8), height=self.cell * 3 + sc(8), bg=parent["bg"],
+                         highlightthickness=0, cursor="hand2")
+        self.vx, self.vy, self.on_change = var_x, var_y, on_change
+        self.bind("<Button-1>", self._click)
+        self._draw()
+
+    def _click(self, e):
+        cx = min(2, max(0, (e.x - sc(4)) // self.cell))
+        cy = min(2, max(0, (e.y - sc(4)) // self.cell))
+        self.vx.set(int(cx))
+        self.vy.set(int(cy))
+        self._draw()
+        if self.on_change:
+            self.on_change()
+
+    def _draw(self):
+        self.delete("all")
+        c, g = self.cell, sc(3)
+        for j in range(3):
+            for i in range(3):
+                on = (i, j) == (self.vx.get(), self.vy.get())
+                x, y = sc(4) + i * c, sc(4) + j * c
+                round_rect(self, x + g, y + g, x + c - g, y + c - g, sc(5),
+                           fill=GOLD if on else DARK, outline=TEXT if on else PANEL_HI)
+                if on:
+                    self.create_oval(x + c / 2 - sc(3), y + c / 2 - sc(3), x + c / 2 + sc(3), y + c / 2 + sc(3),
+                                     fill=DARK, outline="")
+
+
+def game_entry(parent, var, width=5):
+    """게임 스타일 숫자 입력칸."""
+    return tk.Entry(parent, textvariable=var, width=width, justify="center", bg=DARK, fg=TEXT,
+                    insertbackground=GOLD, relief="flat", bd=sc(4), font=F(10, False),
+                    highlightthickness=max(1, sc(2)), highlightbackground=PANEL_HI, highlightcolor=GOLD,
+                    selectbackground=GOLD, selectforeground=DARK)
 
 
 class Card(tk.Frame):
@@ -544,7 +637,25 @@ class App(Root):
         self.fea = tk.DoubleVar(value=20)
         self.trim = tk.BooleanVar(value=False)
         self.glob = tk.BooleanVar(value=False)
+        # 크기 · 자르기 · 위치 옵션 (배경 제거 뒤에 순서대로 적용: 자르기 -> 여백 -> 크기 -> 캔버스/위치)
+        self.tab = 0
+        self.pad = tk.DoubleVar(value=0)
+        self.crop_v = [tk.DoubleVar(value=0) for _ in range(4)]      # 왼쪽, 위, 오른쪽, 아래 (%)
+        self.rz_mode = tk.StringVar(value="none")                    # none | scale | size
+        self.scale = tk.DoubleVar(value=200)
+        self.rz_w, self.rz_h = tk.StringVar(value="512"), tk.StringVar(value="512")
+        self.keep_ratio = tk.BooleanVar(value=True)
+        self.method = tk.StringVar(value="smooth")                   # nearest | smooth | sharp
+        self.cv_on = tk.BooleanVar(value=False)
+        self.cv_w, self.cv_h = tk.StringVar(value="256"), tk.StringVar(value="256")
+        self.fit = tk.BooleanVar(value=False)
+        self.ax, self.ay = tk.IntVar(value=1), tk.IntVar(value=1)
+        self.off_x, self.off_y = tk.DoubleVar(value=0), tk.DoubleVar(value=0)
+        self.margin = tk.DoubleVar(value=0)
+        for v in (self.rz_w, self.rz_h, self.cv_w, self.cv_h, self.rz_mode, self.method):
+            v.trace_add("write", lambda *a: self._schedule())        # 입력하면 미리보기 갱신
         self.bgcolor = None
+        self._info_text = ""
         self._job = None
         self._rb_job = None
         self._ready = False
@@ -672,26 +783,28 @@ class App(Root):
         self.cv_before = self._preview_box(pv, self.tr("orig"), SUB)
         tk.Label(pv, text="➜", bg=PANEL, fg=GOLD, font=F(22)).pack(side="left", padx=sc(6))
         self.cv_after = self._preview_box(pv, self.tr("result"), MINT)
+        self.info_lbl = tk.Label(c2.body, text=self._info_text, bg=PANEL, fg=GOLD, font=F(9, False))
+        self.info_lbl.pack(pady=(sc(2), 0))
+        self.chips = []
 
-        opts = tk.Frame(c2.body, bg=PANEL)
-        opts.pack(fill="x", pady=(sc(6), 0))
-        self._slider_row(opts, self.tr("tol_name"), self.tol, 0, 120, GOLD, self.tr("tol_tip"))
-        self._slider_row(opts, self.tr("fea_name"), self.fea, 0, 60, PINK, self.tr("fea_tip"))
-        rowc = tk.Frame(c2.body, bg=PANEL)
-        rowc.pack(fill="x", pady=(sc(4), 0))
-        fixed_label(rowc, self.tr("bg_color"), 90, F(10)).pack(side="left", fill="y")
-        self.swatch = tk.Canvas(rowc, width=sc(28), height=sc(28), bg=PANEL, highlightthickness=0)
-        self.swatch.pack(side="left")
-        self.bg_text = tk.Label(rowc, text=self._bg_text(), bg=PANEL, fg=SUB, font=F(10, False), anchor="w")
-        self.bg_text.pack(side="left", padx=sc(6))
-        GameButton(rowc, self.tr("pick_color"), self.pick_color, SKY, SKY_D, DARK, height=32, font=f10).pack(side="left")
-        GameButton(rowc, self.tr("auto"), self.auto_color, GOLD, GOLD_D, DARK, height=32, font=f10).pack(
-            side="left", padx=sc(6))
-        self._paint_swatch()
-        tg = tk.Frame(c2.body, bg=PANEL)
-        tg.pack(fill="x", pady=(sc(2), 0))
-        GameToggle(tg, self.tr("trim"), self.trim).pack(side="left")
-        GameToggle(tg, self.tr("glob"), self.glob, self.update_preview).pack(side="left")
+        # 탭: 배경 / 크기 · 업스케일 / 자르기 / 위치
+        tabbar = tk.Frame(c2.body, bg=PANEL)
+        tabbar.pack(fill="x", pady=(sc(4), sc(2)))
+        self.tab_btns = []
+        for i, key in enumerate(("tab_bg", "tab_size", "tab_crop", "tab_pos")):
+            b = GameButton(tabbar, self.tr(key), lambda i=i: self._select_tab(i), INACTIVE, INACTIVE_D, TEXT,
+                           height=28, font=f10)
+            b.pack(side="left", padx=(0, sc(5)))
+            self.tab_btns.append(b)
+        tabbody = tk.Frame(c2.body, bg=PANEL, height=sc(TAB_H))
+        tabbody.pack(fill="x")
+        tabbody.pack_propagate(False)
+        self.tab_frames = []
+        for builder in (self._tab_bg, self._tab_size, self._tab_crop, self._tab_pos):
+            fr = tk.Frame(tabbody, bg=PANEL)
+            builder(fr)
+            self.tab_frames.append(fr)
+        self._select_tab(self.tab)
 
         # 시작 (아래)
         bottom = tk.Frame(self, bg=BG)
@@ -708,6 +821,161 @@ class App(Root):
         self.status = tk.Label(info, text="", bg=BG, fg=SUB, font=F(10), anchor="w")
         self.status.pack(fill="x")
         self._render_status()
+
+    # ------------------------------------------------------------ 탭 (배경 / 크기 / 자르기 / 위치)
+    def _select_tab(self, i):
+        self.tab = i
+        for fr in self.tab_frames:
+            fr.pack_forget()
+        self.tab_frames[i].pack(fill="both", expand=True)
+        for j, b in enumerate(self.tab_btns):
+            b.restyle(*((GOLD, GOLD_D, DARK) if j == i else (INACTIVE, INACTIVE_D, TEXT)))
+
+    def _chips(self, parent, options, var):
+        """여러 개 중 하나를 고르는 버튼 묶음."""
+        for key, label in options:
+            b = GameButton(parent, label, lambda k=key: self._chip_click(var, k), INACTIVE, INACTIVE_D, TEXT,
+                           height=26, font=F(10))
+            b.pack(side="left", padx=(0, sc(5)))
+            self.chips.append((var, key, b))
+        self._refresh_chips()
+
+    def _chip_click(self, var, key):
+        var.set(key)
+        self._refresh_chips()
+
+    def _refresh_chips(self):
+        for var, key, b in self.chips:
+            b.restyle(*((GOLD, GOLD_D, DARK) if var.get() == key else (INACTIVE, INACTIVE_D, TEXT)))
+
+    def _mini(self, parent, label, var, lo, hi, color, width=110, label_w=48, suffix=""):
+        """이름 + 슬라이더 한 줄 (가로로 나란히 놓을 수 있게 pack(side=left))."""
+        r = tk.Frame(parent, bg=PANEL)
+        fixed_label(r, label, label_w, F(10)).pack(side="left", fill="y")
+        GameSlider(r, var, lo, hi, color, width, self._schedule, suffix).pack(side="left")
+        return r
+
+    def _num(self, var, default=0):
+        try:
+            return max(0, min(MAX_PX, int(float(var.get()))))
+        except (ValueError, tk.TclError):
+            return default
+
+    def opts(self):
+        """현재 화면의 크기·자르기·위치 옵션 (remove_bg.postprocess 에 그대로 전달)."""
+        cw, ch = self._num(self.cv_w), self._num(self.cv_h)
+        o = rb.default_opts()
+        o.update(
+            crop=tuple(v.get() for v in self.crop_v), trim=self.trim.get(), pad=int(self.pad.get()),
+            resize=self.rz_mode.get(), scale=self.scale.get(),
+            size=(self._num(self.rz_w), self._num(self.rz_h)), keep_ratio=self.keep_ratio.get(),
+            method=self.method.get(),
+            canvas=(cw, ch) if self.cv_on.get() and cw > 0 and ch > 0 else None,
+            fit=self.fit.get(), align=(self.ax.get(), self.ay.get()),
+            offset=(self.off_x.get(), self.off_y.get()), margin=int(self.margin.get()))
+        return o
+
+    def _tab_bg(self, fr):
+        f10 = F(10)
+        self._slider_row(fr, self.tr("tol_name"), self.tol, 0, 120, GOLD, self.tr("tol_tip"))
+        self._slider_row(fr, self.tr("fea_name"), self.fea, 0, 60, PINK, self.tr("fea_tip"))
+        rowc = tk.Frame(fr, bg=PANEL)
+        rowc.pack(fill="x", pady=(sc(4), 0))
+        fixed_label(rowc, self.tr("bg_color"), 90, f10).pack(side="left", fill="y")
+        self.swatch = tk.Canvas(rowc, width=sc(28), height=sc(28), bg=PANEL, highlightthickness=0)
+        self.swatch.pack(side="left")
+        self.bg_text = tk.Label(rowc, text=self._bg_text(), bg=PANEL, fg=SUB, font=F(10, False), anchor="w")
+        self.bg_text.pack(side="left", padx=sc(6))
+        GameButton(rowc, self.tr("pick_color"), self.pick_color, SKY, SKY_D, DARK, height=32, font=f10).pack(side="left")
+        GameButton(rowc, self.tr("auto"), self.auto_color, GOLD, GOLD_D, DARK, height=32, font=f10).pack(
+            side="left", padx=sc(6))
+        self._paint_swatch()
+        tg = tk.Frame(fr, bg=PANEL)
+        tg.pack(fill="x", pady=(sc(2), 0))
+        GameToggle(tg, self.tr("glob"), self.glob, self.update_preview).pack(side="left")
+
+    def _tab_size(self, fr):
+        r1 = tk.Frame(fr, bg=PANEL)
+        r1.pack(fill="x", pady=(0, sc(2)))
+        self._chips(r1, [("none", self.tr("rz_none")), ("scale", self.tr("rz_scale")),
+                         ("size", self.tr("rz_size"))], self.rz_mode)
+        r2 = tk.Frame(fr, bg=PANEL)
+        r2.pack(fill="x")
+        fixed_label(r2, self.tr("sc_name"), 64, F(10)).pack(side="left", fill="y")
+        self.scale_slider = GameSlider(r2, self.scale, 10, 400, GOLD, 170, self._on_scale, "%")
+        self.scale_slider.pack(side="left")
+        for label, val in (("½", 50), ("×1", 100), ("×2", 200), ("×3", 300), ("×4", 400)):
+            GameButton(r2, label, lambda v=val: self._set_scale(v), SKY, SKY_D, DARK, width=38, height=22,
+                       font=F(9)).pack(side="left", padx=(0, sc(3)))
+        r3 = tk.Frame(fr, bg=PANEL)
+        r3.pack(fill="x", pady=(sc(2), 0))
+        fixed_label(r3, self.tr("sc_size"), 64, F(10)).pack(side="left", fill="y")
+        for var, sep in ((self.rz_w, "×"), (self.rz_h, "")):
+            e = game_entry(r3, var, 6)
+            e.pack(side="left", padx=(0, sc(4)))
+            e.bind("<KeyRelease>", lambda ev: self._auto_mode("size"))
+            if sep:
+                tk.Label(r3, text=sep, bg=PANEL, fg=SUB, font=F(10)).pack(side="left", padx=(0, sc(4)))
+        tk.Label(r3, text="px", bg=PANEL, fg=SUB, font=F(9, False)).pack(side="left", padx=(0, sc(8)))
+        GameToggle(r3, self.tr("keep_ratio"), self.keep_ratio, self._schedule).pack(side="left")
+        r4 = tk.Frame(fr, bg=PANEL)
+        r4.pack(fill="x", pady=(sc(4), 0))
+        fixed_label(r4, self.tr("method"), 64, F(10)).pack(side="left", fill="y")
+        self._chips(r4, [("nearest", self.tr("m_nearest")), ("smooth", self.tr("m_smooth")),
+                         ("sharp", self.tr("m_sharp"))], self.method)
+
+    def _tab_crop(self, fr):
+        r1 = tk.Frame(fr, bg=PANEL)
+        r1.pack(fill="x")
+        GameToggle(r1, self.tr("trim"), self.trim, self._schedule).pack(side="left")
+        self._mini(r1, self.tr("pad_name"), self.pad, 0, 64, MINT, 110, 84, "px").pack(side="left", padx=(sc(8), 0))
+        grid = tk.Frame(fr, bg=PANEL)
+        grid.pack(fill="x", pady=(sc(4), 0))
+        for row, (a, b) in enumerate(((0, 2), (1, 3))):
+            for col, idx in enumerate((a, b)):
+                name = self.tr(("crop_l", "crop_t", "crop_r", "crop_b")[idx])
+                self._mini(grid, name, self.crop_v[idx], 0, 45, PINK, 130, 66, "%").grid(
+                    row=row, column=col, sticky="w", padx=(0, sc(14)))
+        tk.Label(fr, text=self.tr("crop_hint"), bg=PANEL, fg=SUB, font=F(9, False), anchor="w",
+                 justify="left", wraplength=sc(560)).pack(fill="x", pady=(sc(4), 0))
+
+    def _tab_pos(self, fr):
+        r1 = tk.Frame(fr, bg=PANEL)
+        r1.pack(fill="x")
+        cv_toggle = GameToggle(r1, self.tr("cv_use"), self.cv_on, self._schedule)
+        cv_toggle.pack(side="left")
+        for var, sep in ((self.cv_w, "×"), (self.cv_h, "")):
+            e = game_entry(r1, var, 6)
+            e.pack(side="left", padx=(0, sc(4)))
+            e.bind("<KeyRelease>", lambda ev, t=cv_toggle: (self.cv_on.set(True), t._draw()))  # 입력하면 자동으로 켬
+            if sep:
+                tk.Label(r1, text=sep, bg=PANEL, fg=SUB, font=F(10)).pack(side="left", padx=(0, sc(4)))
+        tk.Label(r1, text="px", bg=PANEL, fg=SUB, font=F(9, False)).pack(side="left", padx=(0, sc(8)))
+        GameToggle(r1, self.tr("cv_fit"), self.fit, self._schedule).pack(side="left")
+        r2 = tk.Frame(fr, bg=PANEL)
+        r2.pack(fill="x", pady=(sc(4), 0))
+        GameAlignGrid(r2, self.ax, self.ay, self._schedule).pack(side="left", padx=(sc(4), sc(12)))
+        col = tk.Frame(r2, bg=PANEL)
+        col.pack(side="left", fill="x", expand=True)
+        for name, var, lo, hi, color in ((self.tr("off_x"), self.off_x, -200, 200, GOLD),
+                                         (self.tr("off_y"), self.off_y, -200, 200, GOLD),
+                                         (self.tr("margin"), self.margin, 0, 64, MINT)):
+            self._mini(col, name, var, lo, hi, color, 170, 100, "px").pack(anchor="w")
+
+    def _on_scale(self):
+        self._auto_mode("scale")
+        self._schedule()
+
+    def _set_scale(self, v):
+        self.scale.set(v)
+        self.scale_slider._draw()
+        self._auto_mode("scale")
+        self._schedule()
+
+    def _auto_mode(self, mode):
+        if self.rz_mode.get() != mode:
+            self.rz_mode.set(mode)
+        self._refresh_chips()
 
     def _restore(self):
         for f in self.files:
@@ -806,6 +1074,8 @@ class App(Root):
         for cv in (self.cv_before, self.cv_after):
             cv.delete("img")
             cv.itemconfig("ph", state="normal")
+        self._info_text = ""
+        self.info_lbl.config(text="")
         self.set_status("st_empty", SUB)
 
     def pick_out(self):
@@ -850,14 +1120,36 @@ class App(Root):
         try:
             img = Image.open(self.files[sel[0]])
             img.load()
-            img.thumbnail((sc(PV_W) - 6, sc(PV_H) - 6))
-            res = rb.remove_bg(img, self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get())
-            bg = checker(res.size, sc(10)).convert("RGBA")
-            bg.alpha_composite(res)
-            self._show(self.cv_before, img, "_pb")
+            ow, oh = img.size
+            work = img.copy()
+            work.thumbnail((PREVIEW_WORK, PREVIEW_WORK))
+            ref = work.width / ow          # px 옵션(여백·크기·이동)을 축소 미리보기에 맞추는 비율
+            res = rb.remove_bg(work, self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get())
+            res = rb.postprocess(res, self.opts(), ref)
+            bw, bh = sc(PV_W) - 6, sc(PV_H) - 6
+            before = self._fit_rgba(work.convert("RGBA"), bw, bh)
+            after = self._fit_rgba(res, bw, bh)
+            bg = checker(after.size, sc(10)).convert("RGBA")
+            bg.alpha_composite(after)
+            self._show(self.cv_before, before, "_pb")
             self._show(self.cv_after, bg, "_pa")
+            self._info_text = self.tr("size_info", ow=ow, oh=oh, w=max(1, round(res.width / ref)),
+                                      h=max(1, round(res.height / ref)))
+            self.info_lbl.config(text=self._info_text)
         except Exception as e:
             self.set_status("st_preview_fail", PINK, e=e)
+
+    @staticmethod
+    def _fit_rgba(img, bw, bh):
+        """칸에 맞게 표시용으로 키우거나 줄인다. 작은 도트 이미지는 정수배로 또렷하게 확대."""
+        z = min(bw / img.width, bh / img.height)
+        if z >= 2:
+            k = int(z)
+            return img.resize((img.width * k, img.height * k), Image.NEAREST)
+        if z < 1:
+            size = (max(1, int(img.width * z)), max(1, int(img.height * z)))
+            return img.convert("RGBa").resize(size, Image.LANCZOS).convert("RGBA")
+        return img
 
     # ------------------------------------------------------------ 실행
     def run(self):
@@ -866,7 +1158,7 @@ class App(Root):
             return
         self.busy = True
         self.run_btn.config_state("disabled", self.tr("working"))
-        args = (self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get(), self.trim.get(),
+        args = (self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get(), self.opts(),
                 self.cfg["outdir"], list(self.files))
         threading.Thread(target=self._work, args=args, daemon=True).start()
         self.after(100, self._poll)
@@ -886,7 +1178,7 @@ class App(Root):
                 self._done(*v)
                 return
 
-    def _work(self, tol, fea, color, glob, trim, outdir, files):
+    def _work(self, tol, fea, color, glob, opts, outdir, files):
         ok, fail, last = 0, [], None
         used = set()
         n = len(files)
@@ -896,9 +1188,7 @@ class App(Root):
                 d.mkdir(parents=True, exist_ok=True)
                 img = Image.open(f)
                 img.load()
-                res = rb.remove_bg(img, tol, fea, color, glob)
-                if trim:
-                    res = rb.trim(res)
+                res = rb.postprocess(rb.remove_bg(img, tol, fea, color, glob), opts)
                 res.save(rb.unique_dst(d, f, used))
                 last = d
                 ok += 1
@@ -1035,6 +1325,9 @@ def selftest(out_path):
         out = rb.remove_bg(img)
         res["engine_ok"] = out.getpixel((0, 0))[3] == 0 and out.getpixel((30, 30))[3] == 255
         res["icon_loaded"] = hasattr(app, "_icon")
+        o = rb.default_opts()
+        o.update(resize="scale", scale=200, method="nearest", canvas=(64, 64))
+        res["post_ok"] = rb.postprocess(out, o).size == (64, 64)
         app.destroy()
     except Exception:
         res["error"] = traceback.format_exc()
