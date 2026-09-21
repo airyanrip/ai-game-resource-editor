@@ -2,7 +2,7 @@
 # requires-python = ">=3.9"
 # dependencies = ["pillow", "numpy", "scipy", "tkinterdnd2"]
 # ///
-"""배경 지우개 GUI (게임 스타일). 더블클릭용 실행 파일은 '배경투명화.bat'.
+"""배경 지우개 GUI (게임 스타일). exe 빌드는 build_exe.bat.
 
 - 창 크기에 맞춰 UI 전체가 비율대로 커지고 작아진다 (크기 조절이 멈추면 다시 그림)
 - 설정: 언어(한국어/English/日本語/中文), 캐시 정리, 자동 저장 경로
@@ -19,7 +19,7 @@ import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import filedialog, messagebox
 
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from PIL import Image, ImageTk
 import remove_bg as rb
 
@@ -31,11 +31,20 @@ except Exception:  # 드래그앤드롭 없이도 동작
     Root = tk.Tk
 
 # ---- 경로 ----
-PROG_DIR = Path(__file__).resolve().parent
-ROOT_DIR = PROG_DIR.parent
-FONT_DIR = ROOT_DIR / "폰트"
+# exe(PyInstaller)로 실행하면: 번들 리소스는 임시 폴더(_MEIPASS), 설정/캐시는 exe 옆에 둔다.
+FROZEN = getattr(sys, "frozen", False)
+if FROZEN:
+    BUNDLE_DIR = Path(sys._MEIPASS)
+    ROOT_DIR = Path(sys.executable).resolve().parent
+    PROG_DIR = ROOT_DIR
+else:
+    PROG_DIR = Path(__file__).resolve().parent
+    BUNDLE_DIR = ROOT_DIR = PROG_DIR.parent
+FONT_DIR = BUNDLE_DIR / "fonts"
+ASSET_DIR = BUNDLE_DIR / "assets"
 SETTINGS_PATH = ROOT_DIR / "settings.json"
-CACHE_ITEMS = [PROG_DIR / "__pycache__", ROOT_DIR / "error_log.txt", ROOT_DIR / "cache"]
+LOG_PATH = ROOT_DIR / "error_log.txt"
+CACHE_ITEMS = [ROOT_DIR / "cache", LOG_PATH] + ([] if FROZEN else [PROG_DIR / "__pycache__"])
 
 # ---- 팔레트 ----
 BG = "#1a1240"
@@ -162,7 +171,7 @@ T = {
         "set_title": "설정",
         "set_lang": "언어 / Language",
         "set_cache": "캐시 정리",
-        "set_cache_info": "임시 파일 크기: {s}\n(오류 기록·파이썬 임시 파일. 원본과 결과 이미지는 지워지지 않아요)",
+        "set_cache_info": "임시 파일 크기: {s}\n(오류 기록·임시 파일. 원본과 결과 이미지는 지워지지 않아요)",
         "set_cache_btn": "✖ 캐시 정리하기",
         "set_cache_done": "{s}를 정리했어요!",
         "set_save": "자동 저장 경로",
@@ -203,7 +212,7 @@ T = {
         "set_title": "Settings",
         "set_lang": "Language / 언어",
         "set_cache": "Clear cache",
-        "set_cache_info": "Temp file size: {s}\n(error log & Python temp files. Your images are never deleted)",
+        "set_cache_info": "Temp file size: {s}\n(error log & temp files. Your images are never deleted)",
         "set_cache_btn": "✖ Clear cache",
         "set_cache_done": "Cleared {s}!",
         "set_save": "Auto-save folder",
@@ -244,7 +253,7 @@ T = {
         "set_title": "設定",
         "set_lang": "言語 / Language",
         "set_cache": "キャッシュ削除",
-        "set_cache_info": "一時ファイルのサイズ: {s}\n(エラーログ・Pythonの一時ファイル。画像は削除されません)",
+        "set_cache_info": "一時ファイルのサイズ: {s}\n(エラーログ・一時ファイル。画像は削除されません)",
         "set_cache_btn": "✖ キャッシュを削除",
         "set_cache_done": "{s}を削除しました!",
         "set_save": "自動保存先",
@@ -285,7 +294,7 @@ T = {
         "set_title": "设置",
         "set_lang": "语言 / Language",
         "set_cache": "清理缓存",
-        "set_cache_info": "临时文件大小: {s}\n(错误日志和 Python 临时文件，不会删除你的图片)",
+        "set_cache_info": "临时文件大小: {s}\n(错误日志和临时文件，不会删除你的图片)",
         "set_cache_btn": "✖ 清理缓存",
         "set_cache_done": "已清理 {s}！",
         "set_save": "自动保存路径",
@@ -298,8 +307,17 @@ T = {
 
 
 # ======================================================================
-# 설정 저장/불러오기, 캐시
+# 설정 저장/불러오기, 캐시, 오류 기록
 # ======================================================================
+def log_error(text):
+    """창이 없는 exe에서도 원인을 알 수 있게 error_log.txt에 남긴다."""
+    try:
+        with open(LOG_PATH, "a", encoding="utf-8") as f:
+            f.write(text + chr(10))
+    except Exception:
+        pass
+
+
 def load_settings():
     cfg = {"lang": "ko", "outdir": ""}
     try:
@@ -546,6 +564,17 @@ class App(Root):
         self.minsize(int(App.BASE_W * 0.6), int(App.BASE_H * 0.6))
         self.bind("<Configure>", self._on_configure)
         self.after(500, lambda: setattr(self, "_ready", True))
+        try:  # 창 아이콘
+            self._icon = ImageTk.PhotoImage(Image.open(ASSET_DIR / "icon.png"))
+            self.iconphoto(True, self._icon)
+        except Exception:
+            pass
+        paths = [a for a in sys.argv[1:] if not a.startswith("--")]  # exe 아이콘 위로 파일을 끌어다 놓은 경우
+        if paths:
+            self.after(300, lambda: self.add(paths))
+
+    def report_callback_exception(self, exc, val, tb):
+        log_error("".join(traceback.format_exception(exc, val, tb)))
 
     def tr(self, key, **kw):
         s = T[self.cfg["lang"]].get(key) or T["ko"][key]
@@ -992,5 +1021,32 @@ class App(Root):
         self.open_settings()
 
 
+def selftest(out_path):
+    """빌드 검증용: 라이브러리/폰트/드래그앤드롭/엔진이 번들에 제대로 들어갔는지 점검."""
+    res = {"frozen": FROZEN, "pixel_font": PIXEL, "dnd": DND_FILES is not None}
+    try:
+        app = App()
+        app.update()
+        res["galmuri_family"] = _family("Galmuri11")
+        res["scale"] = S
+        img = Image.new("RGB", (60, 60), (0, 200, 0))
+        from PIL import ImageDraw
+        ImageDraw.Draw(img).ellipse((15, 15, 45, 45), fill=(200, 30, 30))
+        out = rb.remove_bg(img)
+        res["engine_ok"] = out.getpixel((0, 0))[3] == 0 and out.getpixel((30, 30))[3] == 255
+        res["icon_loaded"] = hasattr(app, "_icon")
+        app.destroy()
+    except Exception:
+        res["error"] = traceback.format_exc()
+    Path(out_path).write_text(json.dumps(res, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 if __name__ == "__main__":
-    App().mainloop()
+    if "--selftest" in sys.argv:
+        selftest(sys.argv[sys.argv.index("--selftest") + 1])
+    else:
+        try:
+            App().mainloop()
+        except Exception:
+            log_error(traceback.format_exc())
+            raise

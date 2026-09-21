@@ -1,5 +1,10 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 settings.json
 error_log.txt
 cache/
+# exe 빌드 산출물 (exe는 GitHub Releases로 배포)
+build/
+dist/
+*.spec
+*.exe

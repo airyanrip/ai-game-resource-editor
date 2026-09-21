@@ -1,0 +1,28 @@
+@echo off
+setlocal
+rem Build BG-Eraser.exe (single file, no console). Requires uv: https://docs.astral.sh/uv/
+rem Output: dist\BG-Eraser.exe   (build\ and dist\ are git-ignored; publish the exe via GitHub Releases)
+cd /d "%~dp0"
+set "PATH=%PATH%;%USERPROFILE%\.local\bin;%LOCALAPPDATA%\hermes\bin"
+where uv >nul 2>nul || (echo uv not found. Install it first: https://docs.astral.sh/uv/getting-started/installation/ & pause & exit /b 1)
+
+uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinterdnd2 python tools\make_icon.py
+if errorlevel 1 (pause & exit /b 1)
+
+uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinterdnd2 pyinstaller ^
+  --noconfirm --clean --onefile --windowed ^
+  --name BG-Eraser ^
+  --icon assets\icon.ico ^
+  --paths src ^
+  --add-data "assets\icon.png;assets" ^
+  --add-data "fonts\Galmuri11.ttf;fonts" ^
+  --add-data "fonts\Galmuri14.ttf;fonts" ^
+  --add-data "assets\icon.ico;assets" ^
+  --collect-all tkinterdnd2 ^
+  --hidden-import remove_bg ^
+  --exclude-module matplotlib --exclude-module pandas --exclude-module IPython --exclude-module pytest ^
+  "src\remove_bg_gui.pyw"
+if errorlevel 1 (pause & exit /b 1)
+echo.
+echo Done: %~dp0dist\BG-Eraser.exe
+pause
