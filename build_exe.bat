@@ -4,7 +4,18 @@ rem Build AI-Game-Resource-Editor.exe (single file, no console). Requires uv: ht
 rem Output: dist\AI-Game-Resource-Editor.exe   (build\ and dist\ are git-ignored; publish the exe via GitHub Releases)
 cd /d "%~dp0"
 set "PATH=%PATH%;%USERPROFILE%\.local\bin;%LOCALAPPDATA%\hermes\bin"
-where uv >nul 2>nul || (echo uv not found. Install it first: https://docs.astral.sh/uv/getting-started/installation/ & pause & exit /b 1)
+where uv >nul 2>nul
+if errorlevel 1 (
+  rem uv (free Python runner) is missing: show a friendly dialog that offers auto-install or the install page.
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0tools\setup_uv.ps1"
+  set "PATH=%PATH%;%USERPROFILE%\.local\bin"
+  where uv >nul 2>nul
+  if errorlevel 1 (
+    echo uv still not found. Install it manually, then run build_exe.bat again:
+    echo https://docs.astral.sh/uv/getting-started/installation/
+    pause & exit /b 1
+  )
+)
 
 uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinterdnd2 python tools\make_icon.py
 if errorlevel 1 (pause & exit /b 1)
