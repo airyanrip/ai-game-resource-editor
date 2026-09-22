@@ -1,8 +1,19 @@
 @echo off
 setlocal
-rem Build AI-Game-Resource-Editor.exe (single file, no console). Requires uv: https://docs.astral.sh/uv/
-rem Output: dist\AI-Game-Resource-Editor.exe   (build\ and dist\ are git-ignored; publish the exe via GitHub Releases)
+rem This script BUILDS the app from source (for developers). Requires uv: https://docs.astral.sh/uv/
+rem Output: dist\AI-Game-Resource-Editor.exe (also copied next to this file, then launched automatically)
+rem
+rem Just want to USE the app? You don't need this script -- download the ready-made .exe instead:
+rem   https://github.com/airyanrip/ai-game-resource-editor/releases/latest
+rem (Downloading this repo as a ZIP via GitHub's "Code" button does NOT include the .exe --
+rem  that only runs this build script, which takes a few minutes and needs uv.)
 cd /d "%~dp0"
+echo ============================================================
+echo   Building AI Game Resource Editor from source (developers)
+echo   Just want to use the app? Get the .exe here instead:
+echo   https://github.com/airyanrip/ai-game-resource-editor/releases/latest
+echo ============================================================
+echo.
 set "PATH=%PATH%;%USERPROFILE%\.local\bin;%LOCALAPPDATA%\hermes\bin"
 where uv >nul 2>nul
 if errorlevel 1 (
@@ -34,6 +45,12 @@ uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinter
   --exclude-module matplotlib --exclude-module pandas --exclude-module IPython --exclude-module pytest ^
   "src\remove_bg_gui.pyw"
 if errorlevel 1 (pause & exit /b 1)
+
+copy /y "dist\AI-Game-Resource-Editor.exe" "%~dp0AI-Game-Resource-Editor.exe" >nul
 echo.
-echo Done: %~dp0dist\AI-Game-Resource-Editor.exe
-pause
+echo ============================================================
+echo   Done! Built: %~dp0AI-Game-Resource-Editor.exe
+echo   Starting it now...
+echo ============================================================
+start "" "%~dp0AI-Game-Resource-Editor.exe"
+timeout /t 5 >nul

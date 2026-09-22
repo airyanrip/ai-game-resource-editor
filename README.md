@@ -4,8 +4,14 @@
 Windows용 **exe 한 개**로 실행됩니다. (파이썬·별도 설치 필요 없음)
 
 ## 다운로드 · 실행
-1. [Releases](../../releases/latest)에서 **`AI-Game-Resource-Editor.exe`** 를 받습니다.
+### ➡️ [여기서 AI-Game-Resource-Editor.exe 받기](../../releases/latest)
+1. 위 링크(**Releases**)에서 **`AI-Game-Resource-Editor.exe`** 를 받습니다.
 2. 원하는 폴더에 두고 더블클릭! (처음 실행은 압축을 푸느라 몇 초 걸립니다)
+
+> ⚠️ **이 페이지 위쪽의 초록색 `Code` 버튼(Download ZIP)으로 받지 마세요.**
+> 그 ZIP에는 완성된 exe가 없고 소스 코드만 들어 있어서, `build_exe.bat`을 실행하면 소스에서
+> exe를 처음부터 **빌드**합니다 (개발자용, 몇 분 걸리고 uv가 필요합니다). 그냥 쓰고 싶으시면
+> 위 **Releases** 링크에서 완성된 exe만 받으시면 됩니다.
 
 > **Windows가 "PC를 보호했습니다"라고 막을 때**
 > 서명되지 않은 개인 제작 프로그램이라 나오는 안내입니다. **추가 정보 → 실행**을 누르면 됩니다.
@@ -26,13 +32,14 @@ Windows용 **exe 한 개**로 실행됩니다. (파이썬·별도 설치 필요 
 - 설정: 언어(한국어 / English / 日本語 / 中文), 캐시 정리, 자동 저장 경로
 - [갈무리(Galmuri)](https://github.com/quiple/galmuri) 도트 폰트 사용
 
-## 소스로 실행 / exe 직접 빌드
-[uv](https://docs.astral.sh/uv/)가 필요합니다.
+## 소스로 실행 / exe 직접 빌드 (개발자용)
+그냥 프로그램을 쓰고 싶으시면 이 항목은 필요 없습니다 — 위 [다운로드 · 실행](#다운로드--실행)만 보시면 됩니다.
+소스를 직접 고치거나 exe를 새로 빌드하고 싶을 때만 아래를 씁니다. [uv](https://docs.astral.sh/uv/)가 필요합니다.
 ```
 # 소스로 바로 실행
 uv run src/remove_bg_gui.pyw
 
-# exe 빌드 -> dist/AI-Game-Resource-Editor.exe
+# exe 빌드: dist/AI-Game-Resource-Editor.exe 를 만들고, 루트로 복사한 뒤, 자동으로 실행까지 해줍니다
 build_exe.bat
 
 # 명령줄(CLI)로 일괄 처리
@@ -49,7 +56,7 @@ uv run src/remove_bg.py sprite.png --trim --scale 400 --method nearest --canvas 
 
 ## 구성
 ```
-build_exe.bat      exe 빌드 스크립트 (PyInstaller)
+build_exe.bat      exe 빌드 스크립트 (개발자용, PyInstaller) - 그냥 쓰려면 필요 없음, Releases에서 exe를 받으세요
 src/               소스 (remove_bg_gui.pyw = GUI, remove_bg.py = 엔진 + CLI)
 assets/            아이콘 (tools/make_icon.py 로 생성)
 fonts/             Galmuri (SIL OFL 1.1)
