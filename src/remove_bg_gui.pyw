@@ -2,7 +2,7 @@
 # requires-python = ">=3.9"
 # dependencies = ["pillow", "numpy", "scipy", "tkinterdnd2"]
 # ///
-"""배경 지우개 GUI (게임 스타일). exe 빌드는 build_exe.bat.
+"""AI 게임 리소스 편집기 GUI (게임 스타일). exe 빌드는 build_exe.bat.
 
 - 창 크기에 맞춰 UI 전체가 비율대로 커지고 작아진다 (크기 조절이 멈추면 다시 그림)
 - 설정: 언어(한국어/English/日本語/中文), 캐시 정리, 자동 저장 경로
@@ -144,9 +144,9 @@ LANGS = [("ko", "한국어"), ("en", "English"), ("ja", "日本語"), ("zh", "�
 
 T = {
     "ko": {
-        "win_title": "배경 지우개 ✦ 게임 이미지 투명화",
-        "title": "✦ 배경 지우개 ✦",
-        "subtitle": "이미지를 넣으면 배경이 마법처럼 사라져요!",
+        "win_title": "AI 게임 리소스 편집기",
+        "title": "✦ AI 게임 리소스 편집기 ✦",
+        "subtitle": "배경 제거부터 크기·위치 편집까지 한 번에!",
         "settings": "⚙ 설정",
         "sec1": "이미지 담기", "sec2": "미리보기 · 조절", "sec3": "저장하기",
         "btn_images": "▣ 이미지", "btn_folder": "▶ 폴더", "btn_clear": "✖ 비우기",
@@ -195,9 +195,9 @@ T = {
         "size_info": "원본 {ow}×{oh}px  ➜  결과 {w}×{h}px",
     },
     "en": {
-        "win_title": "BG Eraser ✦ Game image transparency tool",
-        "title": "✦ BG Eraser ✦",
-        "subtitle": "Add an image and the background vanishes like magic!",
+        "win_title": "AI Game Resource Editor",
+        "title": "✦ AI Game Resource Editor ✦",
+        "subtitle": "From background removal to resize & positioning, all in one!",
         "settings": "⚙ Settings",
         "sec1": "Add Images", "sec2": "Preview & Adjust", "sec3": "Save",
         "btn_images": "▣ Images", "btn_folder": "▶ Folder", "btn_clear": "✖ Clear",
@@ -246,9 +246,9 @@ T = {
         "size_info": "Original {ow}×{oh}px  ➜  Result {w}×{h}px",
     },
     "ja": {
-        "win_title": "背景消しゴム ✦ ゲーム画像 背景透過ツール",
-        "title": "✦ 背景消しゴム ✦",
-        "subtitle": "画像を入れると背景が魔法のように消えます!",
+        "win_title": "AIゲームリソースエディター",
+        "title": "✦ AIゲームリソースエディター ✦",
+        "subtitle": "背景除去からサイズ・位置の編集まで、まとめて!",
         "settings": "⚙ 設定",
         "sec1": "画像を入れる", "sec2": "プレビュー・調整", "sec3": "保存",
         "btn_images": "▣ 画像", "btn_folder": "▶ フォルダ", "btn_clear": "✖ クリア",
@@ -297,9 +297,9 @@ T = {
         "size_info": "元 {ow}×{oh}px  ➜  結果 {w}×{h}px",
     },
     "zh": {
-        "win_title": "背景橡皮擦 ✦ 游戏图片背景透明化工具",
-        "title": "✦ 背景橡皮擦 ✦",
-        "subtitle": "放入图片，背景就会像魔法一样消失！",
+        "win_title": "AI 游戏资源编辑器",
+        "title": "✦ AI 游戏资源编辑器 ✦",
+        "subtitle": "从去除背景到调整大小、位置，一站搞定！",
         "settings": "⚙ 设置",
         "sec1": "添加图片", "sec2": "预览 · 调整", "sec3": "保存",
         "btn_images": "▣ 图片", "btn_folder": "▶ 文件夹", "btn_clear": "✖ 清空",

@@ -1,10 +1,10 @@
-# 배경 지우개 (BG Eraser)
+# AI 게임 리소스 편집기 (AI Game Resource Editor)
 
-게임 에셋·리소스 이미지의 **배경을 자동으로 투명화**하는 도트 감성 GUI 프로그램입니다.
+게임 에셋·리소스 이미지의 **배경 제거 · 크기 조절/업스케일 · 자르기 · 위치 조절**을 한 번에 하는 도트 감성 GUI 프로그램입니다.
 Windows용 **exe 한 개**로 실행됩니다. (파이썬·별도 설치 필요 없음)
 
 ## 다운로드 · 실행
-1. [Releases](../../releases/latest)에서 **`BG-Eraser.exe`** 를 받습니다.
+1. [Releases](../../releases/latest)에서 **`AI-Game-Resource-Editor.exe`** 를 받습니다.
 2. 원하는 폴더에 두고 더블클릭! (처음 실행은 압축을 푸느라 몇 초 걸립니다)
 
 > **Windows가 "PC를 보호했습니다"라고 막을 때**
@@ -22,6 +22,7 @@ Windows용 **exe 한 개**로 실행됩니다. (파이썬·별도 설치 필요 
 - **위치 조절**: 고정 캔버스(예: 256×256) 안에 9방향 정렬 + 가로·세로 이동 + 안쪽 여백 + 크기 맞춤
 - 여러 장/폴더 일괄 처리, 끌어다 놓기 지원, 같은 이름 파일 자동 구분
 - 창 크기에 맞춰 UI 전체가 비율대로 확대/축소
+- 배경 제거·업스케일은 AI 모델 없이 색상 분석과 리샘플링 알고리즘으로 동작합니다 (오프라인, 인터넷 불필요)
 - 설정: 언어(한국어 / English / 日本語 / 中文), 캐시 정리, 자동 저장 경로
 - [갈무리(Galmuri)](https://github.com/quiple/galmuri) 도트 폰트 사용
 
@@ -31,7 +32,7 @@ Windows용 **exe 한 개**로 실행됩니다. (파이썬·별도 설치 필요 
 # 소스로 바로 실행
 uv run src/remove_bg_gui.pyw
 
-# exe 빌드 -> dist/BG-Eraser.exe
+# exe 빌드 -> dist/AI-Game-Resource-Editor.exe
 build_exe.bat
 
 # 명령줄(CLI)로 일괄 처리

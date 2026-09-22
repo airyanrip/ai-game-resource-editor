@@ -1,7 +1,7 @@
 @echo off
 setlocal
-rem Build BG-Eraser.exe (single file, no console). Requires uv: https://docs.astral.sh/uv/
-rem Output: dist\BG-Eraser.exe   (build\ and dist\ are git-ignored; publish the exe via GitHub Releases)
+rem Build AI-Game-Resource-Editor.exe (single file, no console). Requires uv: https://docs.astral.sh/uv/
+rem Output: dist\AI-Game-Resource-Editor.exe   (build\ and dist\ are git-ignored; publish the exe via GitHub Releases)
 cd /d "%~dp0"
 set "PATH=%PATH%;%USERPROFILE%\.local\bin;%LOCALAPPDATA%\hermes\bin"
 where uv >nul 2>nul || (echo uv not found. Install it first: https://docs.astral.sh/uv/getting-started/installation/ & pause & exit /b 1)
@@ -11,7 +11,7 @@ if errorlevel 1 (pause & exit /b 1)
 
 uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinterdnd2 pyinstaller ^
   --noconfirm --clean --onefile --windowed ^
-  --name BG-Eraser ^
+  --name AI-Game-Resource-Editor ^
   --icon assets\icon.ico ^
   --paths src ^
   --add-data "assets\icon.png;assets" ^
@@ -24,5 +24,5 @@ uv run --with pyinstaller --with pillow --with numpy --with scipy --with tkinter
   "src\remove_bg_gui.pyw"
 if errorlevel 1 (pause & exit /b 1)
 echo.
-echo Done: %~dp0dist\BG-Eraser.exe
+echo Done: %~dp0dist\AI-Game-Resource-Editor.exe
 pause

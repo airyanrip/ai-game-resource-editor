@@ -2,7 +2,7 @@
 # requires-python = ">=3.9"
 # dependencies = ["pillow", "numpy", "scipy"]
 # ///
-"""게임 에셋 이미지 배경 자동 투명화 도구.
+"""AI 게임 리소스 편집기 - 배경 자동 투명화 · 크기 조절 · 자르기 · 위치 조절 엔진 (+ 명령줄 도구).
 
 배경색을 자동 감지(테두리 최빈색)하거나 지정하고, 가장자리에서 이어진 배경 영역만
 투명화한다(캐릭터 내부의 같은 색은 보존). 경계는 부드럽게(feather) 처리하고,
@@ -250,7 +250,7 @@ def collect(paths, recursive):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="게임 에셋 배경 자동 투명화")
+    ap = argparse.ArgumentParser(description="AI 게임 리소스 편집기: 배경 투명화 · 크기 조절 · 자르기 · 위치 조절")
     ap.add_argument("inputs", nargs="+")
     ap.add_argument("-o", "--out")
     ap.add_argument("-t", "--tolerance", type=float, default=30)
