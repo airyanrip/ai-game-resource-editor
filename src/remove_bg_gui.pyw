@@ -159,6 +159,10 @@ T = {
         "trim": "투명 여백 잘라내기", "glob": "그림 안쪽 같은 색도 지우기",
         "save_to": "저장 위치: {p}", "save_default": "원본 옆 'transparent' 폴더",
         "change_save": "▶ 저장 위치 바꾸기",
+        "save_name_label": "저장 이름",
+        "save_name_default": "비워두면 원본 파일 이름을 그대로 써요.",
+        "save_name_single": "저장 이름: {name}",
+        "save_name_multi": "저장 이름: {a}, {b} ... (여러 장이면 번호가 자동으로 붙어요)",
         "start": "✦  투명화 시작!  ✦", "working": "✦  처리 중…  ✦",
         "st_empty": "이미지를 담아주세요!",
         "st_ready": "✔ {n}개 이미지 준비 완료! 아래 버튼을 눌러보세요",
@@ -211,6 +215,10 @@ T = {
         "trim": "Trim transparent margin", "glob": "Also erase same color inside",
         "save_to": "Save to: {p}", "save_default": "next to the original ('transparent' folder)",
         "change_save": "▶ Change save folder",
+        "save_name_label": "Save name",
+        "save_name_default": "Leave empty to keep each file's original name.",
+        "save_name_single": "Save as: {name}",
+        "save_name_multi": "Save as: {a}, {b} ... (numbered automatically for multiple files)",
         "start": "✦  REMOVE BG!  ✦", "working": "✦  Working…  ✦",
         "st_empty": "Add some images!",
         "st_ready": "✔ {n} image(s) ready! Press the big button below",
@@ -263,6 +271,10 @@ T = {
         "trim": "透明な余白を切り取る", "glob": "絵の中の同じ色も消す",
         "save_to": "保存先: {p}", "save_default": "元画像の隣 ('transparent' フォルダ)",
         "change_save": "▶ 保存先を変更",
+        "save_name_label": "保存名",
+        "save_name_default": "空欄なら元のファイル名のまま保存します。",
+        "save_name_single": "保存名: {name}",
+        "save_name_multi": "保存名: {a}, {b} ... (複数枚は自動で番号が付きます)",
         "start": "✦  透明化スタート!  ✦", "working": "✦  処理中…  ✦",
         "st_empty": "画像を入れてください!",
         "st_ready": "✔ {n}枚の画像が準備できました! 下のボタンを押してね",
@@ -315,6 +327,10 @@ T = {
         "trim": "裁掉透明边距", "glob": "同时擦除图内相同颜色",
         "save_to": "保存位置: {p}", "save_default": "原图旁边 ('transparent' 文件夹)",
         "change_save": "▶ 更改保存位置",
+        "save_name_label": "保存名称",
+        "save_name_default": "留空则直接使用原始文件名。",
+        "save_name_single": "保存为: {name}",
+        "save_name_multi": "保存为: {a}, {b} ... (多张图片会自动编号)",
         "start": "✦  开始透明化！  ✦", "working": "✦  处理中…  ✦",
         "st_empty": "请添加图片！",
         "st_ready": "✔ 已准备好 {n} 张图片！请点击下方按钮",
@@ -801,6 +817,8 @@ class App(Root):
         self.margin = tk.DoubleVar(value=0)
         for v in (self.rz_w, self.rz_h, self.cv_w, self.cv_h, self.rz_mode, self.method):
             v.trace_add("write", lambda *a: self._schedule())        # 입력하면 미리보기 갱신
+        self.save_name = tk.StringVar(value="")                      # 비우면 원본 파일 이름 사용
+        self.save_name.trace_add("write", lambda *a: self._refresh_save_name_hint())
         self.bgcolor = None
         self._info_text = ""
         self._job = None
@@ -921,6 +939,14 @@ class App(Root):
         GameButton(c3.body, self.tr("change_save"), self.pick_out, SKY, SKY_D, DARK, height=34, font=f10).pack(
             anchor="w", pady=(sc(4), 0))
         self._refresh_out_label()
+        namerow = tk.Frame(c3.body, bg=PANEL)
+        namerow.pack(fill="x", pady=(sc(8), 0))
+        fixed_label(namerow, self.tr("save_name_label"), 68, f10).pack(side="left", fill="y")
+        game_entry(namerow, self.save_name, 14).pack(side="left", fill="x", expand=True)
+        self.save_name_hint = tk.Label(c3.body, text="", bg=PANEL, fg=SUB, font=F(9, False), anchor="w",
+                                       justify="left", wraplength=sc(LEFT_W - 50))
+        self.save_name_hint.pack(fill="x", pady=(sc(2), 0))
+        self._refresh_save_name_hint()
 
         # 2. 미리보기 · 조절
         c2 = Card(right, 2, self.tr("sec2"), GOLD)
@@ -1177,6 +1203,19 @@ class App(Root):
         p = self.cfg["outdir"] or self.tr("save_default")
         self.out_lbl.config(text=self.tr("save_to", p=p))
 
+    def _refresh_save_name_hint(self):
+        if not hasattr(self, "save_name_hint"):
+            return
+        raw = self.save_name.get().strip()
+        if not raw:
+            self.save_name_hint.config(text=self.tr("save_name_default"))
+            return
+        name = rb.sanitize_name(raw)
+        if len(self.files) > 1:
+            self.save_name_hint.config(text=self.tr("save_name_multi", a=f"{name}.png", b=f"{name}_2.png"))
+        else:
+            self.save_name_hint.config(text=self.tr("save_name_single", name=f"{name}.png"))
+
     # ------------------------------------------------------------ 파일
     def _list_text(self, f):
         return f"  {f.name}    ({f.parent.name})"
@@ -1191,6 +1230,7 @@ class App(Root):
             self.sel = 0
         self.update_preview()
         self.set_status("st_ready", MINT, n=len(self.files))
+        self._refresh_save_name_hint()
 
     def on_drop(self, e):
         self.add(self.tk.splitlist(e.data))
@@ -1225,6 +1265,7 @@ class App(Root):
         self._info_text = ""
         self.info_lbl.config(text="")
         self.set_status("st_empty", SUB)
+        self._refresh_save_name_hint()
 
     def pick_out(self):
         p = filedialog.askdirectory(title=self.tr("dlg_out"))
@@ -1308,7 +1349,7 @@ class App(Root):
         self.busy = True
         self.run_btn.config_state("disabled", self.tr("working"))
         args = (self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get(), self.opts(),
-                self.cfg["outdir"], list(self.files))
+                self.cfg["outdir"], list(self.files), self.save_name.get())
         threading.Thread(target=self._work, args=args, daemon=True).start()
         self.after(100, self._poll)
 
@@ -1327,10 +1368,11 @@ class App(Root):
                 self._done(*v)
                 return
 
-    def _work(self, tol, fea, color, glob, opts, outdir, files):
+    def _work(self, tol, fea, color, glob, opts, outdir, files, name):
         ok, fail, last = 0, [], None
         used = set()
         n = len(files)
+        custom = rb.sanitize_name(name.strip()) if name.strip() else None
         for i, f in enumerate(files, 1):
             try:
                 d = Path(outdir) if outdir else f.parent / "transparent"
@@ -1338,7 +1380,11 @@ class App(Root):
                 img = Image.open(f)
                 img.load()
                 res = rb.postprocess(rb.remove_bg(img, tol, fea, color, glob), opts)
-                res.save(rb.unique_dst(d, f, used))
+                if custom:
+                    dst = rb.unique_dst(d, custom, used)
+                else:
+                    dst = rb.unique_dst(d, f.stem, used, f.suffix.lstrip(".").lower())
+                res.save(dst)
                 last = d
                 ok += 1
             except Exception:

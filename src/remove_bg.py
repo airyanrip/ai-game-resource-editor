@@ -12,6 +12,7 @@
   uv run remove_bg.py 입력.png [입력2.jpg 폴더 ...] [옵션]
   옵션:
     -o DIR         출력 폴더 (기본: 입력 옆 'transparent' 폴더)
+    -n NAME        저장 파일 이름(확장자 없이). 여러 장이면 자동으로 번호(hero, hero_2 ...)
     -t N           색상 허용 오차 0~255 (기본 30)
     -f N           경계 부드러움 폭 (기본 20, 0=하드 엣지)
     -c R,G,B|#hex  배경색 직접 지정 (기본: 자동 감지)
@@ -30,6 +31,7 @@
     --overwrite    원본 파일명 그대로 같은 위치에 덮어쓰기(PNG 변환)
 """
 import argparse
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -222,14 +224,28 @@ def postprocess(img, o, ref=1.0):
     return img
 
 
-def unique_dst(folder, src, used):
-    """한 번의 작업 안에서 저장 경로가 겹치지 않게 한다 (hero.png + hero.jpg -> hero.png, hero_jpg.png)."""
-    dst = folder / (src.stem + ".png")
+_BAD_NAME_CHARS = re.compile(r'[<>:"/\\|?*\x00-\x1f]')
+
+
+def sanitize_name(name, fallback="image"):
+    """저장 이름으로 쓸 수 없는 문자(윈도우 금지 문자 등)를 지우고 다듬는다. 비면 fallback."""
+    name = _BAD_NAME_CHARS.sub("", name).strip(" .")
+    return name[:120] or fallback
+
+
+def unique_dst(folder, stem, used, suffix_hint=""):
+    """한 번의 작업 안에서 저장 경로가 겹치지 않게 한다.
+
+    suffix_hint(원본 확장자)가 있으면 처음 겹칠 때 그걸로 구분하고(hero.png+hero.jpg
+    -> hero.png, hero_jpg.png), 그래도 겹치면(직접 지정한 이름이 여럿 겹칠 때 등) 번호를 붙인다.
+    """
+    dst = folder / f"{stem}.png"
     if dst in used:
-        dst = folder / f"{src.stem}_{src.suffix.lstrip('.').lower()}.png"
+        if suffix_hint:
+            dst = folder / f"{stem}_{suffix_hint}.png"
         n = 2
         while dst in used:
-            dst = folder / f"{src.stem}_{src.suffix.lstrip('.').lower()}{n}.png"
+            dst = folder / (f"{stem}_{suffix_hint}{n}.png" if suffix_hint else f"{stem}_{n}.png")
             n += 1
     used.add(dst)
     return dst
@@ -253,6 +269,7 @@ def main():
     ap = argparse.ArgumentParser(description="AI 게임 리소스 편집기: 배경 투명화 · 크기 조절 · 자르기 · 위치 조절")
     ap.add_argument("inputs", nargs="+")
     ap.add_argument("-o", "--out")
+    ap.add_argument("-n", "--name", help="저장 파일 이름(확장자 없이). 여러 장이면 자동으로 번호가 붙음 (예: hero, hero_2 ...)")
     ap.add_argument("-t", "--tolerance", type=float, default=30)
     ap.add_argument("-f", "--feather", type=float, default=20)
     ap.add_argument("-c", "--color")
@@ -302,6 +319,7 @@ def main():
         opts["offset"] = pair("--offset", a.offset, ",")
 
     color = parse_color(a.color) if a.color else None
+    name = sanitize_name(a.name) if a.name else None
     files = collect(a.inputs, a.recursive)
     if not files:
         print("처리할 이미지가 없습니다.")
@@ -316,7 +334,10 @@ def main():
             else:
                 d = Path(a.out) if a.out else f.parent / "transparent"
                 d.mkdir(parents=True, exist_ok=True)
-                dst = unique_dst(d, f, used)
+                if name:
+                    dst = unique_dst(d, name, used)
+                else:
+                    dst = unique_dst(d, f.stem, used, f.suffix.lstrip(".").lower())
             img = Image.open(f)
             img.load()
             res = remove_bg(img, a.tolerance, a.feather, color, a.global_mode)
