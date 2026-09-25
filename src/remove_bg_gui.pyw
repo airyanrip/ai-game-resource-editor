@@ -188,7 +188,8 @@ T = {
         "sc_name": "배율", "sc_size": "크기", "keep_ratio": "비율 유지",
         "method": "방식", "m_nearest": "또렷하게(도트)", "m_smooth": "부드럽게", "m_sharp": "선명하게",
         "pad_name": "남길 여백",
-        "crop_l": "왼쪽", "crop_t": "위", "crop_r": "오른쪽", "crop_b": "아래",
+        "crop_drag_hint": "◆ 왼쪽 원본 그림 위의 상자를 끌어 잘라낼 범위를 정하세요 (모서리 = 크기, 안쪽 = 이동)",
+        "crop_reset": "↻ 전체 이미지로",
         "crop_hint": "자르기는 배경을 지운 직후에, '투명 여백 잘라내기'는 그다음에 적용돼요.",
         "cv_use": "캔버스 사용", "cv_fit": "크기 맞춤",
         "off_x": "가로 이동", "off_y": "세로 이동", "margin": "안쪽 여백",
@@ -239,7 +240,8 @@ T = {
         "sc_name": "Scale", "sc_size": "Size", "keep_ratio": "Keep ratio",
         "method": "Method", "m_nearest": "Crisp (pixel art)", "m_smooth": "Smooth", "m_sharp": "Sharp",
         "pad_name": "Keep margin",
-        "crop_l": "Left", "crop_t": "Top", "crop_r": "Right", "crop_b": "Bottom",
+        "crop_drag_hint": "◆ Drag the box on the original image (left) to pick what to keep (corners = resize, inside = move)",
+        "crop_reset": "↻ Full image",
         "crop_hint": "Crop is applied right after the background is removed; 'Trim transparent margin' comes next.",
         "cv_use": "Use canvas", "cv_fit": "Fit to canvas",
         "off_x": "Move X", "off_y": "Move Y", "margin": "Inner margin",
@@ -290,7 +292,8 @@ T = {
         "sc_name": "倍率", "sc_size": "サイズ", "keep_ratio": "比率を保つ",
         "method": "方式", "m_nearest": "くっきり(ドット)", "m_smooth": "なめらか", "m_sharp": "シャープ",
         "pad_name": "残す余白",
-        "crop_l": "左", "crop_t": "上", "crop_r": "右", "crop_b": "下",
+        "crop_drag_hint": "◆ 左の元画像の上の枠をドラッグして範囲を選んでください (角=サイズ変更、内側=移動)",
+        "crop_reset": "↻ 画像全体",
         "crop_hint": "切り抜きは背景を消した直後に、「透明な余白を切り取る」はその次に適用されます。",
         "cv_use": "キャンバス使用", "cv_fit": "サイズ合わせ",
         "off_x": "横に移動", "off_y": "縦に移動", "margin": "内側の余白",
@@ -341,7 +344,8 @@ T = {
         "sc_name": "倍率", "sc_size": "尺寸", "keep_ratio": "保持比例",
         "method": "方式", "m_nearest": "清晰(像素)", "m_smooth": "平滑", "m_sharp": "锐化",
         "pad_name": "保留边距",
-        "crop_l": "左", "crop_t": "上", "crop_r": "右", "crop_b": "下",
+        "crop_drag_hint": "◆ 拖动左侧原图上的方框来选择裁剪范围 (角=改大小, 内部=移动)",
+        "crop_reset": "↻ 完整图片",
         "crop_hint": "裁剪在去除背景后立即应用，「裁掉透明边距」在其之后应用。",
         "cv_use": "使用画布", "cv_fit": "适应画布",
         "off_x": "横向移动", "off_y": "纵向移动", "margin": "内边距",
@@ -592,6 +596,149 @@ def game_entry(parent, var, width=5):
                     selectbackground=GOLD, selectforeground=DARK)
 
 
+class CropBox:
+    """원본 미리보기 위에 그리는 대화형 자르기 상자 (모바일 사진 자르기 스타일).
+
+    모서리 4개·변 중앙 4개 손잡이를 끌어 크기를 바꾸고, 상자 안을 끌면 통째로 옮긴다.
+    바깥쪽은 어둡게 표시된다. 실제 상태는 여전히 app.crop_v(좌·상·우·하 %) 4개에 저장되므로
+    엔진(postprocess)은 그대로 쓴다 — 이 클래스는 그 값을 그림 위에서 조작하는 입력 장치일 뿐이다.
+    """
+    MIN_FRAC = 0.08   # 상자가 이보다 작아지지 않도록 (원본 대비 최소 8%)
+
+    def __init__(self, app):
+        self.app = app
+        self.canvas = app.cv_before
+        self.img_size = None    # (표시된 이미지 픽셀 너비, 높이) — 없으면(placeholder) 아무것도 안 그림
+        self.active = False     # '자르기' 탭일 때만 손잡이 표시
+        self.drag = None        # None 또는 'move'/'tl'/'tr'/'bl'/'br'/'t'/'b'/'l'/'r'
+        self.anchor = None      # 드래그 시작 시점의 상자(px)와 마우스 좌표
+        for seq, cb in (("<ButtonPress-1>", self._press), ("<B1-Motion>", self._motion),
+                       ("<ButtonRelease-1>", self._release), ("<Motion>", self._hover),
+                       ("<Leave>", lambda e: self.canvas.config(cursor=""))):
+            self.canvas.bind(seq, cb, add=True)
+
+    def set_active(self, on):
+        self.active = on
+        self.draw()
+
+    def set_image_box(self, pw, ph):
+        self.img_size = (pw, ph)
+        self.draw()
+
+    def _img_box(self):
+        cw, ch = int(self.canvas["width"]), int(self.canvas["height"])
+        pw, ph = self.img_size
+        cx, cy = cw // 2, ch // 2
+        return (cx - pw / 2, cy - ph / 2, cx + pw / 2, cy + ph / 2)
+
+    def _rect(self):
+        """crop_v(%) -> 캔버스 픽셀 좌표의 상자."""
+        x0, y0, x1, y1 = self._img_box()
+        w, h = x1 - x0, y1 - y0
+        l, t, r, b = (v.get() for v in self.app.crop_v)
+        return (x0 + w * l / 100, y0 + h * t / 100, x1 - w * r / 100, y1 - h * b / 100)
+
+    def _handles(self, rect):
+        x0, y0, x1, y1 = rect
+        mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+        return {"tl": (x0, y0), "tr": (x1, y0), "bl": (x0, y1), "br": (x1, y1),
+                "t": (mx, y0), "b": (mx, y1), "l": (x0, my), "r": (x1, my)}
+
+    CURSORS = {"tl": "size_nw_se", "br": "size_nw_se", "tr": "size_ne_sw", "bl": "size_ne_sw",
+              "t": "size_ns", "b": "size_ns", "l": "size_we", "r": "size_we", "move": "fleur"}
+
+    def _hit(self, x, y):
+        if not (self.active and self.img_size):
+            return None
+        rect = self._rect()
+        tol = sc(9)
+        for name, (hx, hy) in self._handles(rect).items():
+            if abs(x - hx) <= tol and abs(y - hy) <= tol:
+                return name
+        x0, y0, x1, y1 = rect
+        if x0 <= x <= x1 and y0 <= y <= y1:
+            return "move"
+        return None
+
+    def _hover(self, e):
+        if self.drag is None:
+            hit = self._hit(e.x, e.y)
+            self.canvas.config(cursor=self.CURSORS.get(hit, ""))
+
+    def _press(self, e):
+        hit = self._hit(e.x, e.y)
+        if not hit:
+            return
+        self.drag = hit
+        self.anchor = (self._rect(), e.x, e.y)
+
+    def _motion(self, e):
+        if not self.drag:
+            return
+        (rx0, ry0, rx1, ry1), sx, sy = self.anchor
+        dx, dy = e.x - sx, e.y - sy
+        x0, y0, x1, y1 = self._img_box()
+        w, h = x1 - x0, y1 - y0
+        minw, minh = w * self.MIN_FRAC, h * self.MIN_FRAC
+        nx0, ny0, nx1, ny1 = rx0, ry0, rx1, ry1
+        if self.drag == "move":
+            dx = max(x0 - rx0, min(dx, x1 - rx1))
+            dy = max(y0 - ry0, min(dy, y1 - ry1))
+            nx0, nx1 = rx0 + dx, rx1 + dx
+            ny0, ny1 = ry0 + dy, ry1 + dy
+        else:
+            if "l" in self.drag:
+                nx0 = max(x0, min(rx0 + dx, rx1 - minw))
+            if "r" in self.drag:
+                nx1 = min(x1, max(rx1 + dx, rx0 + minw))
+            if "t" in self.drag:
+                ny0 = max(y0, min(ry0 + dy, ry1 - minh))
+            if "b" in self.drag:
+                ny1 = min(y1, max(ry1 + dy, ry0 + minh))
+        l, t = (nx0 - x0) / w * 100, (ny0 - y0) / h * 100
+        r, b = (x1 - nx1) / w * 100, (y1 - ny1) / h * 100
+        for var, val in zip(self.app.crop_v, (l, t, r, b)):
+            var.set(max(0, min(100, val)))
+        self.draw()
+        self.app._schedule()
+
+    def _release(self, e):
+        self.drag = None
+        self.anchor = None
+        self._hover(e)
+
+    def reset(self):
+        for var in self.app.crop_v:
+            var.set(0)
+        self.draw()
+        self.app._schedule()
+
+    def draw(self):
+        self.canvas.delete("cropui")
+        if not (self.active and self.img_size):
+            return
+        x0, y0, x1, y1 = self._img_box()
+        rx0, ry0, rx1, ry1 = self._rect()
+        cw, ch = int(self.canvas["width"]), int(self.canvas["height"])
+        # 바깥쪽을 어둡게 (stipple = 반투명 느낌을 흉내)
+        for bx0, by0, bx1, by1 in ((0, 0, cw, ry0), (0, ry1, cw, ch),
+                                   (0, ry0, rx0, ry1), (rx1, ry0, cw, ry1)):
+            if bx1 > bx0 and by1 > by0:
+                self.canvas.create_rectangle(bx0, by0, bx1, by1, fill=DARK, outline="",
+                                             stipple="gray50", tags="cropui")
+        if self.drag:  # 드래그 중에는 3분할 안내선
+            for i in (1, 2):
+                gx = rx0 + (rx1 - rx0) * i / 3
+                gy = ry0 + (ry1 - ry0) * i / 3
+                self.canvas.create_line(gx, ry0, gx, ry1, fill=TEXT, stipple="gray25", tags="cropui")
+                self.canvas.create_line(rx0, gy, rx1, gy, fill=TEXT, stipple="gray25", tags="cropui")
+        self.canvas.create_rectangle(rx0, ry0, rx1, ry1, outline=GOLD, width=max(1, sc(2)), tags="cropui")
+        hs = sc(5)
+        for hx, hy in self._handles((rx0, ry0, rx1, ry1)).values():
+            self.canvas.create_rectangle(hx - hs, hy - hs, hx + hs, hy + hs, fill=GOLD, outline=DARK,
+                                         width=max(1, sc(1)), tags="cropui")
+
+
 class Card(tk.Frame):
     """제목 뱃지가 달린 카드."""
 
@@ -781,6 +928,7 @@ class App(Root):
         pv = tk.Frame(c2.body, bg=PANEL)
         pv.pack()
         self.cv_before = self._preview_box(pv, self.tr("orig"), SUB)
+        self.cropbox = CropBox(self)
         tk.Label(pv, text="➜", bg=PANEL, fg=GOLD, font=F(22)).pack(side="left", padx=sc(6))
         self.cv_after = self._preview_box(pv, self.tr("result"), MINT)
         self.info_lbl = tk.Label(c2.body, text=self._info_text, bg=PANEL, fg=GOLD, font=F(9, False))
@@ -830,6 +978,7 @@ class App(Root):
         self.tab_frames[i].pack(fill="both", expand=True)
         for j, b in enumerate(self.tab_btns):
             b.restyle(*((GOLD, GOLD_D, DARK) if j == i else (INACTIVE, INACTIVE_D, TEXT)))
+        self.cropbox.set_active(i == 2)  # 2 = 자르기 탭
 
     def _chips(self, parent, options, var):
         """여러 개 중 하나를 고르는 버튼 묶음."""
@@ -925,17 +1074,14 @@ class App(Root):
                          ("sharp", self.tr("m_sharp"))], self.method)
 
     def _tab_crop(self, fr):
+        tk.Label(fr, text=self.tr("crop_drag_hint"), bg=PANEL, fg=TEXT, font=F(10, False), anchor="w",
+                 justify="left", wraplength=sc(560)).pack(fill="x", anchor="w")
+        GameButton(fr, self.tr("crop_reset"), self.cropbox.reset, SKY, SKY_D, DARK, height=28,
+                  font=F(10)).pack(anchor="w", pady=(sc(4), sc(6)))
         r1 = tk.Frame(fr, bg=PANEL)
         r1.pack(fill="x")
         GameToggle(r1, self.tr("trim"), self.trim, self._schedule).pack(side="left")
         self._mini(r1, self.tr("pad_name"), self.pad, 0, 64, MINT, 110, 84, "px").pack(side="left", padx=(sc(8), 0))
-        grid = tk.Frame(fr, bg=PANEL)
-        grid.pack(fill="x", pady=(sc(4), 0))
-        for row, (a, b) in enumerate(((0, 2), (1, 3))):
-            for col, idx in enumerate((a, b)):
-                name = self.tr(("crop_l", "crop_t", "crop_r", "crop_b")[idx])
-                self._mini(grid, name, self.crop_v[idx], 0, 45, PINK, 130, 66, "%").grid(
-                    row=row, column=col, sticky="w", padx=(0, sc(14)))
         tk.Label(fr, text=self.tr("crop_hint"), bg=PANEL, fg=SUB, font=F(9, False), anchor="w",
                  justify="left", wraplength=sc(560)).pack(fill="x", pady=(sc(4), 0))
 
@@ -1074,6 +1220,8 @@ class App(Root):
         for cv in (self.cv_before, self.cv_after):
             cv.delete("img")
             cv.itemconfig("ph", state="normal")
+        self.cropbox.img_size = None
+        self.cropbox.draw()
         self._info_text = ""
         self.info_lbl.config(text="")
         self.set_status("st_empty", SUB)
@@ -1133,6 +1281,7 @@ class App(Root):
             bg.alpha_composite(after)
             self._show(self.cv_before, before, "_pb")
             self._show(self.cv_after, bg, "_pa")
+            self.cropbox.set_image_box(self._pb.width(), self._pb.height())
             self._info_text = self.tr("size_info", ow=ow, oh=oh, w=max(1, round(res.width / ref)),
                                       h=max(1, round(res.height / ref)))
             self.info_lbl.config(text=self._info_text)
