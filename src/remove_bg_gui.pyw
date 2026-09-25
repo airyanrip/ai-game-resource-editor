@@ -161,6 +161,7 @@ T = {
         "change_save": "▶ 저장 위치 바꾸기",
         "save_name_label": "저장 이름",
         "save_name_default": "비워두면 원본 파일 이름을 그대로 써요.",
+        "save_name_auto": "지금은 선택한 이미지 이름이 자동으로 채워져 있어요. 그대로 두면 각 이미지가 원래 이름으로 저장되고, 직접 고치면 그 이름을 써요.",
         "save_name_single": "저장 이름: {name}",
         "save_name_multi": "저장 이름: {a}, {b} ... (여러 장이면 번호가 자동으로 붙어요)",
         "start": "✦  투명화 시작!  ✦", "working": "✦  처리 중…  ✦",
@@ -217,6 +218,7 @@ T = {
         "change_save": "▶ Change save folder",
         "save_name_label": "Save name",
         "save_name_default": "Leave empty to keep each file's original name.",
+        "save_name_auto": "Showing the selected image's name automatically. Leave it as is to keep each file's own name, or edit it to use that name instead.",
         "save_name_single": "Save as: {name}",
         "save_name_multi": "Save as: {a}, {b} ... (numbered automatically for multiple files)",
         "start": "✦  REMOVE BG!  ✦", "working": "✦  Working…  ✦",
@@ -273,6 +275,7 @@ T = {
         "change_save": "▶ 保存先を変更",
         "save_name_label": "保存名",
         "save_name_default": "空欄なら元のファイル名のまま保存します。",
+        "save_name_auto": "今は選択中の画像名が自動で入っています。そのままなら各画像が元の名前で保存され、書き換えるとその名前を使います。",
         "save_name_single": "保存名: {name}",
         "save_name_multi": "保存名: {a}, {b} ... (複数枚は自動で番号が付きます)",
         "start": "✦  透明化スタート!  ✦", "working": "✦  処理中…  ✦",
@@ -329,6 +332,7 @@ T = {
         "change_save": "▶ 更改保存位置",
         "save_name_label": "保存名称",
         "save_name_default": "留空则直接使用原始文件名。",
+        "save_name_auto": "现在自动显示的是所选图片的名称。保持不变则每张图片用各自原名保存，修改后会使用你输入的名称。",
         "save_name_single": "保存为: {name}",
         "save_name_multi": "保存为: {a}, {b} ... (多张图片会自动编号)",
         "start": "✦  开始透明化！  ✦", "working": "✦  处理中…  ✦",
@@ -818,6 +822,7 @@ class App(Root):
         for v in (self.rz_w, self.rz_h, self.cv_w, self.cv_h, self.rz_mode, self.method):
             v.trace_add("write", lambda *a: self._schedule())        # 입력하면 미리보기 갱신
         self.save_name = tk.StringVar(value="")                      # 비우면 원본 파일 이름 사용
+        self._name_auto = True   # True = 아직 직접 안 고쳤음(현재 이미지 이름을 자동으로 보여주는 중)
         self.save_name.trace_add("write", lambda *a: self._refresh_save_name_hint())
         self.bgcolor = None
         self._info_text = ""
@@ -942,7 +947,9 @@ class App(Root):
         namerow = tk.Frame(c3.body, bg=PANEL)
         namerow.pack(fill="x", pady=(sc(8), 0))
         fixed_label(namerow, self.tr("save_name_label"), 68, f10).pack(side="left", fill="y")
-        game_entry(namerow, self.save_name, 14).pack(side="left", fill="x", expand=True)
+        name_entry = game_entry(namerow, self.save_name, 14)
+        name_entry.pack(side="left", fill="x", expand=True)
+        name_entry.bind("<KeyRelease>", self._on_name_typed)
         self.save_name_hint = tk.Label(c3.body, text="", bg=PANEL, fg=SUB, font=F(9, False), anchor="w",
                                        justify="left", wraplength=sc(LEFT_W - 50))
         self.save_name_hint.pack(fill="x", pady=(sc(2), 0))
@@ -1206,6 +1213,10 @@ class App(Root):
     def _refresh_save_name_hint(self):
         if not hasattr(self, "save_name_hint"):
             return
+        if self._name_auto:
+            key = "save_name_auto" if self.files else "save_name_default"
+            self.save_name_hint.config(text=self.tr(key))
+            return
         raw = self.save_name.get().strip()
         if not raw:
             self.save_name_hint.config(text=self.tr("save_name_default"))
@@ -1215,6 +1226,16 @@ class App(Root):
             self.save_name_hint.config(text=self.tr("save_name_multi", a=f"{name}.png", b=f"{name}_2.png"))
         else:
             self.save_name_hint.config(text=self.tr("save_name_single", name=f"{name}.png"))
+
+    def _on_name_typed(self, e=None):
+        """저장 이름 칸에 직접 입력하면, 그때부터는 자동으로 채워주지 않고 그 값을 그대로 쓴다."""
+        self._name_auto = False
+        self._refresh_save_name_hint()
+
+    def _maybe_autofill_name(self):
+        """아직 직접 고치지 않았다면(_name_auto), 지금 선택된 이미지의 이름을 저장 이름 칸에 보여준다."""
+        if self._name_auto and self.files and 0 <= self.sel < len(self.files):
+            self.save_name.set(self.files[self.sel].stem)
 
     # ------------------------------------------------------------ 파일
     def _list_text(self, f):
@@ -1230,6 +1251,7 @@ class App(Root):
             self.sel = 0
         self.update_preview()
         self.set_status("st_ready", MINT, n=len(self.files))
+        self._maybe_autofill_name()
         self._refresh_save_name_hint()
 
     def on_drop(self, e):
@@ -1240,6 +1262,7 @@ class App(Root):
         if s:
             self.sel = s[0]
         self.update_preview()
+        self._maybe_autofill_name()
 
     def pick_files(self):
         p = filedialog.askopenfilenames(title=self.tr("dlg_images"), filetypes=[
@@ -1265,6 +1288,8 @@ class App(Root):
         self._info_text = ""
         self.info_lbl.config(text="")
         self.set_status("st_empty", SUB)
+        if self._name_auto:  # 자동으로 보여주던 이름이면 지운다 (직접 지정한 이름은 남겨둠)
+            self.save_name.set("")
         self._refresh_save_name_hint()
 
     def pick_out(self):
@@ -1349,7 +1374,7 @@ class App(Root):
         self.busy = True
         self.run_btn.config_state("disabled", self.tr("working"))
         args = (self.tol.get(), self.fea.get(), self.bgcolor, self.glob.get(), self.opts(),
-                self.cfg["outdir"], list(self.files), self.save_name.get())
+                self.cfg["outdir"], list(self.files), self.save_name.get(), self._name_auto)
         threading.Thread(target=self._work, args=args, daemon=True).start()
         self.after(100, self._poll)
 
@@ -1368,11 +1393,12 @@ class App(Root):
                 self._done(*v)
                 return
 
-    def _work(self, tol, fea, color, glob, opts, outdir, files, name):
+    def _work(self, tol, fea, color, glob, opts, outdir, files, name, auto):
         ok, fail, last = 0, [], None
         used = set()
         n = len(files)
-        custom = rb.sanitize_name(name.strip()) if name.strip() else None
+        # auto(=_name_auto)이면 칸에 뭐가 보이든 그건 그냥 미리보기용 제안일 뿐, 직접 고친 게 아니므로 무시한다.
+        custom = rb.sanitize_name(name.strip()) if (not auto and name.strip()) else None
         for i, f in enumerate(files, 1):
             try:
                 d = Path(outdir) if outdir else f.parent / "transparent"
